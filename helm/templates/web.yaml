@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector:
+    matchLabels:
+      app: web
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: web
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: web
+        image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
+        imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.web.containerPort }}
+        resources:
+          requests:
+            cpu: {{ .Values.web.resources.requests.cpu }}
+            memory: {{ .Values.web.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.web.resources.limits.cpu }}
+            memory: {{ .Values.web.resources.limits.memory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: web
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.web.service.type }}
+  selector:
+    app: web
+    release: {{ .Release.Name }}
+  ports:
+  - port: {{ .Values.web.service.port }}
+    targetPort: {{ .Values.web.service.targetPort }}

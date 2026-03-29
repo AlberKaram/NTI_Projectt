@@ -1,0 +1,91 @@
+# =====================
+# Global Settings
+# =====================
+global:
+  ecrRegistry: "883291274232.dkr.ecr.us-east-2.amazonaws.com"
+  imageTag: "latest"
+
+# =====================
+# API Service
+# =====================
+api:
+  replicaCount: 2
+  image:
+    repository: "883291274232.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo"
+    tag: "api-latest"
+    pullPolicy: Always
+  containerPort: 8080
+  service:
+    port: 8080
+    targetPort: 8080
+    type: ClusterIP
+  env:
+    dbHost: "db"
+    dbUser: "postgres"
+    dbPassword: "postgres"
+    dbName: "appdb"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+# =====================
+# Web (Frontend) Service
+# =====================
+web:
+  replicaCount: 2
+  image:
+    repository: "883291274232.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo"
+    tag: "web-latest"
+    pullPolicy: Always
+  containerPort: 9010
+  service:
+    port: 80
+    targetPort: 9010
+    type: LoadBalancer
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+# =====================
+# PostgreSQL Database
+# =====================
+postgres:
+  replicaCount: 1
+  image:
+    repository: "postgres"
+    tag: "13"
+    pullPolicy: IfNotPresent
+  containerPort: 5432
+  service:
+    port: 5432
+    targetPort: 5432
+    type: ClusterIP
+  env:
+    user: "postgres"
+    password: "postgres"
+    db: "appdb"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  persistence:
+    enabled: false
+    size: "5Gi"
+    storageClass: "gp2"
+
+# =====================
+# Network Policies
+# =====================
+networkPolicy:
+  enabled: true

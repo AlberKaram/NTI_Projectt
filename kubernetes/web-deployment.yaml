@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: 883291274232.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo:web-latest
+        image: 698995615790.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo:web-latest
         ports:
         - containerPort: 9010
 ---

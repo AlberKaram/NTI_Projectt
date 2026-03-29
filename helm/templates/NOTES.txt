@@ -1,0 +1,29 @@
+🎉 NTI App deployed successfully!
+
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+📦 Components:
+  ✅ Web Frontend  (replicas: {{ .Values.web.replicaCount }})
+  ✅ API Backend   (replicas: {{ .Values.api.replicaCount }})
+  ✅ PostgreSQL DB (replicas: {{ .Values.postgres.replicaCount }})
+  {{- if .Values.networkPolicy.enabled }}
+  ✅ Network Policies (enabled)
+  {{- end }}
+
+🌐 Access the app:
+  Run this command to get the LoadBalancer URL:
+  kubectl get svc web -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+
+🔧 Useful commands:
+  # Check all pods
+  kubectl get pods -n {{ .Release.Namespace }}
+
+  # Check services
+  kubectl get svc -n {{ .Release.Namespace }}
+
+  # Upgrade the release
+  helm upgrade {{ .Release.Name }} ./nti-app -n {{ .Release.Namespace }}
+
+  # Uninstall
+  helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}

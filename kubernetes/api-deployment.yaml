@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: 883291274232.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo:api-latest
+        image: 698995615790.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo:api-latest
         env:
         - name: DB_HOST
           value: "db"
