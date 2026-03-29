@@ -1,0 +1,99 @@
+---
+# 0. Remove old Jenkins repo if exists
+- name: Remove old Jenkins repo
+  apt_repository:
+    repo: "deb https://pkg.jenkins.io/debian-stable binary/"
+    state: absent
+    update_cache: no
+
+- name: Remove old Jenkins repo signed
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+    state: absent
+    update_cache: no
+
+# 1. Install Java
+- name: Install Java 17
+  apt:
+    name: openjdk-17-jdk
+    state: present
+    update_cache: yes
+
+# 2. Install gnupg2
+- name: Install gnupg2
+  apt:
+    name: gnupg2
+    state: present
+
+# 3. Add Jenkins GPG key from keyserver
+- name: Add Jenkins GPG key from keyserver
+  shell: |
+    gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 7198F4B714ABFC68
+    gpg --export 7198F4B714ABFC68 > /usr/share/keyrings/jenkins-keyring.gpg
+    chmod 644 /usr/share/keyrings/jenkins-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/jenkins-keyring.gpg
+
+# 4. Add Jenkins repo
+- name: Add Jenkins repo
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+    update_cache: yes
+
+# 5. Install Jenkins
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    state: present
+    update_cache: no
+
+# 6. Start & Enable Jenkins
+- name: Start Jenkins
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+
+# 7. Wait for Jenkins to be up
+- name: Wait for Jenkins to start
+  wait_for:
+    port: 8080
+    delay: 10
+    timeout: 60
+
+# 8. Get initial admin password
+- name: Get Jenkins initial password
+  command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: jenkins_password
+  changed_when: false
+
+- name: Show initial password
+  debug:
+    msg: "Jenkins Initial Password: {{ jenkins_password.stdout }}"
+
+# 9. Skip setup wizard
+- name: Skip Jenkins setup wizard
+  lineinfile:
+    path: /etc/default/jenkins
+    regexp: '^JAVA_ARGS='
+    line: 'JAVA_ARGS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+  notify: restart jenkins
+
+# 10. Wait after restart
+- name: Wait for Jenkins after config
+  wait_for:
+    port: 8080
+    delay: 15
+    timeout: 90
+
+# 11. Install Jenkins plugins
+- name: Install Jenkins plugins
+  community.general.jenkins_plugin:
+    name: "{{ item }}"
+    url: "http://localhost:8080"
+    url_username: admin
+    url_password: "{{ jenkins_password.stdout }}"
+    state: present
+  loop: "{{ jenkins_plugins }}"
+  notify: restart jenkins

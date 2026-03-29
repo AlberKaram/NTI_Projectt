@@ -1,0 +1,10 @@
+jenkins_plugins:
+  - git
+  - workflow-aggregator       # Pipeline
+  - docker-workflow
+  - kubernetes
+  - sonar
+  - amazon-ecr
+  - blueocean
+  - credentials-binding
+  - pipeline-stage-view
