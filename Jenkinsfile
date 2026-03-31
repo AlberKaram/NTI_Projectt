@@ -58,8 +58,9 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 echo '🚀 Deploying to EKS with Helm...'
-                withKubeConfig([credentialsId: 'kubeconfig']) {
+                withAWS(credentials: 'aws-credentials', region: "${AWS_REGION}") {
                     sh """
+                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER}
                         helm upgrade --install nti-prod ./helm/nti-app \
                             --set api.image.tag=api-${IMAGE_TAG} \
                             --set web.image.tag=web-${IMAGE_TAG} \

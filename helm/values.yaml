@@ -2,7 +2,7 @@
 # Global Settings
 # =====================
 global:
-  ecrRegistry: "883291274232.dkr.ecr.us-east-2.amazonaws.com"
+  ecrRegistry: "698995615790.dkr.ecr.us-east-2.amazonaws.com"
   imageTag: "latest"
 
 # =====================
@@ -11,7 +11,7 @@ global:
 api:
   replicaCount: 2
   image:
-    repository: "883291274232.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo"
+    repository: "698995615790.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo"
     tag: "api-latest"
     pullPolicy: Always
   containerPort: 8080
@@ -38,7 +38,7 @@ api:
 web:
   replicaCount: 2
   image:
-    repository: "883291274232.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo"
+    repository: "698995615790.dkr.ecr.us-east-2.amazonaws.com/nti-app-repo"
     tag: "web-latest"
     pullPolicy: Always
   containerPort: 9010
